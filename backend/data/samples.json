@@ -1,0 +1,95 @@
+{
+  "_note": "Sample customer conversations (input metadata only). Expected outcomes live in tests/fixtures/expected_outcomes.json and are never used at runtime.",
+  "samples": [
+    {
+      "sample_id": "S01",
+      "title": "Double deduction + missing order confirmation",
+      "customer": {"reference": "CUST-1001", "name": "Aisha Khan", "email": "aisha.khan@example.com"},
+      "text": "Customer (Aisha Khan, CUST-1001): Hi, I placed order #A-55821 yesterday for $89.99. My bank statement shows two deductions of $89.99 for that single order, so I've been charged twice. On top of that I never received an order confirmation email, so I'm not even sure the order went through.\nAgent: I'm sorry about that. Could you confirm the card's last four digits?\nCustomer: It ends in 4417. Please refund the duplicate charge and send me the confirmation."
+    },
+    {
+      "sample_id": "S02",
+      "title": "Business-critical app down for multiple employees",
+      "customer": {"reference": "CUST-2040", "name": "Northwind Logistics (Raj Patel, Ops Manager)", "email": "ops@northwind.example"},
+      "text": "Raj Patel (Northwind Logistics, CUST-2040): Our dispatch portal has been down since 8:00 this morning. All 35 employees on the dispatch floor get a 503 error and cannot access any routes. We cannot schedule a single delivery right now and trucks are waiting in the yard. We need this restored immediately."
+    },
+    {
+      "sample_id": "S03",
+      "title": "App crashes when opening account",
+      "customer": {"reference": "CUST-1150", "name": "Ben Ortiz"},
+      "text": "Ben Ortiz (CUST-1150): Every time I open the My Account page in your Android app, the app crashes and closes. I've reinstalled it twice and restarted my phone, same thing. I can still use the website for now, but I'd like the app fixed."
+    },
+    {
+      "sample_id": "S04",
+      "title": "Does subscription include monthly reports?",
+      "customer": {"reference": "CUST-1302", "name": "Chen Wei"},
+      "text": "Chen Wei (CUST-1302): Hello! Quick question before my renewal next month - does the Pro subscription include the monthly analytics reports, or is that only in the Business plan? Thanks."
+    },
+    {
+      "sample_id": "S05",
+      "title": "Eligible refund not received in stated timeframe",
+      "customer": {"reference": "CUST-1410", "name": "Fatima Noor", "email": "fatima.noor@example.com"},
+      "text": "Fatima Noor (CUST-1410): I returned the blender from order #C-30218 and got an email on the 2nd saying my refund of $64.00 was approved and would arrive within 10 business days. It has now been over three weeks and nothing has reached my card. Can you tell me where the refund is?"
+    },
+    {
+      "sample_id": "S06",
+      "title": "Delayed shipment needed for an event",
+      "customer": {"reference": "CUST-1522", "name": "Daniel Brooks"},
+      "text": "Daniel Brooks (CUST-1522): My order #B-77310 (the suit and two ties) was supposed to arrive on Monday but tracking hasn't updated in four days. I need it for my daughter's wedding this Saturday, which is in 3 days. Can you tell me where it is or expedite it?"
+    },
+    {
+      "sample_id": "S07",
+      "title": "Suspicious account activity",
+      "customer": {"reference": "CUST-1608", "name": "Grace Liu", "email": "grace.liu@example.com"},
+      "text": "Grace Liu (CUST-1608): I just got an alert about a login to my account from a device in another country, and I did not make that login. When I checked my orders there is a $420 purchase I don't recognize, shipped to an address I've never used. Please lock my account and look into this."
+    },
+    {
+      "sample_id": "S08",
+      "title": "Cannot log in after password reset",
+      "customer": {"reference": "CUST-1733", "name": "Omar Haddad"},
+      "text": "Omar Haddad (CUST-1733): I reset my password using the link you emailed this morning, but now every time I try to sign in it says 'invalid credentials'. I've tried the new password several times. I need to get in to download my invoices for my accountant."
+    },
+    {
+      "sample_id": "S09",
+      "title": "Incorrect invoice + subscription change question",
+      "customer": {"reference": "CUST-1847", "name": "Priya Raman (Brightleaf Studio)"},
+      "text": "Priya Raman (Brightleaf Studio, CUST-1847): Our invoice INV-2291 for October bills us for 12 seats, but we only have 8 active users. Please correct it before it auto-pays. Separately, we're thinking about switching from monthly to annual billing - would we keep the same features, and how is the price calculated?"
+    },
+    {
+      "sample_id": "S10",
+      "title": "Angry customer, routine feature question",
+      "customer": {"reference": "CUST-1955", "name": "Mark Jensen"},
+      "text": "Mark Jensen (CUST-1955): THIS IS RIDICULOUS. I have spent 20 minutes clicking around your app and I am honestly furious. How do I export my contacts to a CSV file?? It should not be this hard!!!"
+    },
+    {
+      "sample_id": "S11",
+      "title": "Late delivery with no identifying details",
+      "customer": null,
+      "text": "Customer: hi my delivery is late. it should have been here already. where is it?"
+    },
+    {
+      "sample_id": "S12",
+      "title": "Repeat customer: unresolved earlier problem + new billing issue",
+      "customer": {"reference": "CUST-1001", "name": "Aisha Khan", "email": "aisha.khan@example.com"},
+      "text": "Aisha Khan (CUST-1001): I contacted you last week because I was charged twice for order #A-55821. Nobody followed up and both deductions of $89.99 are still on my statement. Now there's a new problem: this month's bill includes a $15 late payment fee even though I paid on the due date. Please fix both."
+    },
+    {
+      "sample_id": "S13",
+      "title": "Shared inbox transcript with two customers",
+      "customer": null,
+      "text": "Shared support inbox - live chat transcript\n[CUST-2101] Lena Fischer: Hi, my order #D-11902 arrived today but the phone case inside is cracked. I'd like a replacement please.\n[CUST-2102] Tom Becker: Hello, what are your customer support hours on weekends?\n[CUST-2101] Lena Fischer: I can send photos if that helps."
+    },
+    {
+      "sample_id": "S14",
+      "title": "Ambiguous request needing human review",
+      "customer": {"reference": "CUST-2210", "name": "Ana Souza"},
+      "text": "Ana Souza (CUST-2210): Since the last update something feels off with my account. Things aren't where they used to be and I'm not sure what changed. Can someone look into it?"
+    },
+    {
+      "sample_id": "S15",
+      "title": "Three distinct issues in one conversation",
+      "customer": {"reference": "CUST-2305", "name": "Hiroshi Tanaka"},
+      "text": "Hiroshi Tanaka (CUST-2305): A few things. First, order #E-40417 arrived with the wrong item - I ordered the black backpack and received a grey one. Second, my promo code SPRING20 was accepted at checkout but the 20% discount isn't on my receipt. Third, unrelated: does the backpack come with a warranty, and how long is it?"
+    }
+  ]
+}

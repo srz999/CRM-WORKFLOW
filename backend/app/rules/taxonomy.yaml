@@ -1,0 +1,64 @@
+# Controlled classification taxonomy.
+# The Classification Agent may ONLY return category/subcategory keys listed here.
+# Extend deliberately: add a key, then add routing in routing.yaml.
+
+issue_types:
+  complaint: A problem the customer is experiencing or dissatisfied with.
+  inquiry: A question asking for information; nothing is broken.
+  request: The customer asks for a change or an action (refund, plan change, etc.).
+
+categories:
+  billing_payments:
+    label: Billing and payments
+    subcategories:
+      duplicate_charge: Customer charged more than once for one transaction
+      incorrect_invoice: Invoice amount or line items are wrong
+      payment_failure: Payment declined or not processed
+      other: Other billing matter
+  technical_support:
+    label: Technical support
+    subcategories:
+      service_outage: Service or application unavailable
+      app_crash: Application crashes or freezes
+      bug: Feature not working as expected
+      performance: Slowness or degraded performance
+      other: Other technical matter
+  refunds:
+    label: Refunds
+    subcategories:
+      refund_delayed: An approved or eligible refund has not arrived
+      refund_request: Customer is asking for a refund
+      other: Other refund matter
+  delivery_orders:
+    label: Delivery and orders
+    subcategories:
+      delayed_delivery: Shipment or delivery is late
+      missing_order_confirmation: No order confirmation received
+      wrong_or_damaged_item: Wrong, missing or damaged item
+      order_status: Customer asks about an order's status
+      other: Other order matter
+  account_access:
+    label: Account and access
+    subcategories:
+      login_failure: Customer cannot sign in
+      suspicious_activity: Unrecognised logins, changes or transactions
+      account_update: Change to account details
+      other: Other account matter
+  product_subscription:
+    label: Product and subscription inquiries
+    subcategories:
+      plan_inclusions: What a plan or subscription includes
+      plan_change: Upgrade, downgrade or change of plan
+      feature_question: How a product feature works
+      cancellation: Cancelling a subscription
+      other: Other product matter
+  general_support:
+    label: General support
+    subcategories:
+      general_question: General question not covered elsewhere
+      feedback: Feedback or suggestion
+      other: Other
+  other_needs_review:
+    label: Other / needs review
+    subcategories:
+      unclassified: Cannot be classified confidently; a human must review

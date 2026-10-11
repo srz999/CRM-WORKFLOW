@@ -1,0 +1,85 @@
+# Deterministic priority rules. Applied AFTER the Prioritization Agent; the LLM cannot override them.
+#
+# A rule fires only if every gate it specifies passes:
+#   categories        - issue category is one of these
+#   match             - (subcategory in `subcategories`) OR (any regex in `patterns` matches)
+#                       `patterns` are checked against the verified evidence quotes + issue summary
+#   min_affected_users - extracted affected-user count >= N, OR any regex in `affected_users_patterns` matches
+#   min_amount        - extracted monetary amount >= N
+#   max_deadline_hours - a deadline stated in the conversation falls within N hours
+#
+# Sentiment words (angry, furious, unacceptable...) are deliberately NOT inputs to any rule.
+
+urgent_rules:
+  - id: account_security
+    description: Credible account-security concern (unauthorised access, activity or transactions)
+    categories: [account_access, billing_payments]
+    subcategories: [suspicious_activity]
+    patterns:
+      - "unauthori[sz]ed"
+      - "suspicious"
+      - "\\bhack(ed|ing)?\\b"
+      - "compromised"
+      - "did ?n[o']?t (make|authori[sz]e|recogni[sz]e)"
+      - "don'?t recogni[sz]e"
+      - "\\bfraud"
+
+  - id: multi_user_outage
+    description: Critical outage affecting multiple users
+    categories: [technical_support]
+    subcategories: [service_outage]
+    patterns: ["\\bdown\\b", "unavailable", "outage", "can(not|'?t) (access|reach|load)"]
+    min_affected_users: 2
+    affected_users_patterns:
+      - "\\b(all|multiple|several|many|entire|whole)\\b.{0,30}\\b(employees|users|staff|team|agents|company|office)"
+      - "\\b\\d+\\s+(employees|users|staff|agents|people)\\b"
+
+  - id: duplicate_charge
+    description: Significant financial harm - customer charged more than once
+    categories: [billing_payments]
+    subcategories: [duplicate_charge]
+    patterns:
+      - "charged twice"
+      - "double[- ]?charg"
+      - "(two|2|duplicate) (deductions|charges|payments)"
+      - "deducted twice"
+
+  - id: high_value_financial_harm
+    description: Significant financial harm - amount at or above threshold
+    categories: [billing_payments, refunds]
+    min_amount: 1000
+
+  - id: imminent_deadline
+    description: A stated deadline falls within 48 hours
+    max_deadline_hours: 48
+
+# Minimum priority floors (raise to at least MEDIUM).
+medium_rules:
+  - id: blocked_access
+    description: Customer is blocked from their account
+    subcategories: [login_failure]
+  - id: application_failure
+    description: Application crash or broken functionality
+    subcategories: [app_crash, bug, service_outage]
+  - id: overdue_refund
+    description: Eligible refund overdue
+    subcategories: [refund_delayed]
+  - id: billing_error
+    description: Billing error with financial impact
+    subcategories: [incorrect_invoice, duplicate_charge, payment_failure]
+  - id: delivery_problem
+    description: Late, missing or wrong order
+    subcategories: [delayed_delivery, missing_order_confirmation, wrong_or_damaged_item]
+  - id: deadline_this_week
+    description: A stated deadline falls within 7 days
+    max_deadline_hours: 168
+
+guards:
+  # URGENT is only allowed when an urgent rule fires. An unsupported LLM URGENT
+  # is lowered to MEDIUM and flagged for human review.
+  urgent_requires_rule: true
+  # A plain inquiry with no rule support cannot exceed this priority
+  # (stops tone/sentiment from inflating priority).
+  inquiry_max_priority_without_rule: LOW
+  # Below this classification/priority confidence the ticket is flagged for review.
+  min_confidence: 0.6

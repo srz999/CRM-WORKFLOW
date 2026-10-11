@@ -1,0 +1,32 @@
+# Deterministic routing: category -> responsible support team.
+teams:
+  - Billing
+  - Technical Support
+  - Refunds
+  - Fulfillment
+  - Account Security
+  - Customer Success
+  - General Support
+  - Triage
+
+category_team:
+  billing_payments: Billing
+  technical_support: Technical Support
+  refunds: Refunds
+  delivery_orders: Fulfillment
+  account_access: Account Security
+  product_subscription: Customer Success
+  general_support: General Support
+  other_needs_review: Triage
+
+# SLA target (hours until follow-up due) per final priority.
+sla_hours:
+  URGENT: 4
+  MEDIUM: 24
+  LOW: 72
+
+# Recommendations touching these always require human approval before anything
+# is done for the customer. The system never performs these actions itself.
+human_approval:
+  categories: [refunds]
+  subcategories: [duplicate_charge, incorrect_invoice, suspicious_activity, account_update, plan_change, cancellation]

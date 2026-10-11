@@ -1,0 +1,34 @@
+{
+  "_note": "Expected outcomes for evaluation. Used by tests (with mocked LLM) and evals/run_eval.py (live LLM). Never read at runtime.",
+  "S01": [
+    {"customer_ref": "CUST-1001", "category": "billing_payments", "priority": "URGENT"},
+    {"customer_ref": "CUST-1001", "category": "delivery_orders", "priority": "MEDIUM"}
+  ],
+  "S02": [{"customer_ref": "CUST-2040", "category": "technical_support", "priority": "URGENT"}],
+  "S03": [{"customer_ref": "CUST-1150", "category": "technical_support", "priority": "MEDIUM"}],
+  "S04": [{"customer_ref": "CUST-1302", "category": "product_subscription", "priority": "LOW"}],
+  "S05": [{"customer_ref": "CUST-1410", "category": "refunds", "priority": "MEDIUM"}],
+  "S06": [{"customer_ref": "CUST-1522", "category": "delivery_orders", "priority": "MEDIUM"}],
+  "S07": [{"customer_ref": "CUST-1608", "category": "account_access", "priority": "URGENT"}],
+  "S08": [{"customer_ref": "CUST-1733", "category": "account_access", "priority": "MEDIUM"}],
+  "S09": [
+    {"customer_ref": "CUST-1847", "category": "billing_payments", "priority": "MEDIUM"},
+    {"customer_ref": "CUST-1847", "category": "product_subscription", "priority": "LOW"}
+  ],
+  "S10": [{"customer_ref": "CUST-1955", "category": "product_subscription", "priority": "LOW"}],
+  "S11": [{"customer_ref": null, "category": "delivery_orders", "priority": "MEDIUM", "review_required": true}],
+  "S12": [
+    {"customer_ref": "CUST-1001", "category": "billing_payments", "priority": "URGENT"},
+    {"customer_ref": "CUST-1001", "category": "billing_payments", "priority": "MEDIUM"}
+  ],
+  "S13": [
+    {"customer_ref": "CUST-2101", "category": "delivery_orders", "priority": "MEDIUM"},
+    {"customer_ref": "CUST-2102", "category": "general_support", "priority": "LOW"}
+  ],
+  "S14": [{"customer_ref": "CUST-2210", "category": "other_needs_review", "priority": "LOW", "review_required": true}],
+  "S15": [
+    {"customer_ref": "CUST-2305", "category": "delivery_orders", "priority": "MEDIUM"},
+    {"customer_ref": "CUST-2305", "category": "billing_payments", "priority": "MEDIUM"},
+    {"customer_ref": "CUST-2305", "category": "product_subscription", "priority": "LOW"}
+  ]
+}
