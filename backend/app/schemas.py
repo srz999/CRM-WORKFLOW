@@ -38,6 +38,7 @@ class CustomerOut(BaseModel):
 
 class TicketSummary(BaseModel):
     id: int
+    issue_id: int
     ticket_number: str
     customer_ref: str | None
     summary: str

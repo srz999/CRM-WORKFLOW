@@ -19,6 +19,7 @@ TICKET_LOAD = (selectinload(Ticket.issue), selectinload(Ticket.customer))
 def ticket_summary(t: Ticket) -> TicketSummary:
     return TicketSummary(
         id=t.id,
+        issue_id=t.issue_id,
         ticket_number=t.ticket_number,
         customer_ref=t.customer.reference if t.customer else None,
         summary=t.issue.summary,

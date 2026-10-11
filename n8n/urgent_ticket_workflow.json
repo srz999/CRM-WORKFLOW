@@ -1,0 +1,88 @@
+{
+  "name": "CRM - urgent ticket notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "crm-ticket-created",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "a1d7c3f0-0001-4c1e-9b1a-000000000001",
+      "name": "CRM ticket created",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "crm-ticket-created"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Keep only URGENT tickets from the CRM payload {event, tickets:[...]}\nconst out = [];\nfor (const item of $input.all()) {\n  const tickets = (item.json.body || item.json).tickets || [];\n  for (const t of tickets) if (t.priority === 'URGENT') out.push({ json: t });\n}\nreturn out;"
+      },
+      "id": "a1d7c3f0-0002-4c1e-9b1a-000000000002",
+      "name": "Only URGENT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_NOTIFY_URL || 'https://example.invalid/replace-me' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: `URGENT ${$json.ticket_number}: ${$json.title} -> ${$json.team} (due ${$json.due_at})`, ticket: $json }) }}",
+        "options": {}
+      },
+      "id": "a1d7c3f0-0003-4c1e-9b1a-000000000003",
+      "name": "Notify destination",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 0]
+    },
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "hours", "hoursInterval": 1 }] }
+      },
+      "id": "a1d7c3f0-0004-4c1e-9b1a-000000000004",
+      "name": "Every hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 240]
+    },
+    {
+      "parameters": {
+        "url": "={{ ($env.CRM_API_URL || 'http://host.docker.internal:8000') + '/api/tickets?overdue=true' }}",
+        "options": {}
+      },
+      "id": "a1d7c3f0-0005-4c1e-9b1a-000000000005",
+      "name": "Get overdue open tickets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [260, 240]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_NOTIFY_URL || 'https://example.invalid/replace-me' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: `OVERDUE ${$json.ticket_number}: ${$json.title} (${$json.priority}, ${$json.team})`, ticket: $json }) }}",
+        "options": {}
+      },
+      "id": "a1d7c3f0-0006-4c1e-9b1a-000000000006",
+      "name": "Notify overdue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 240]
+    }
+  ],
+  "connections": {
+    "CRM ticket created": { "main": [[{ "node": "Only URGENT", "type": "main", "index": 0 }]] },
+    "Only URGENT": { "main": [[{ "node": "Notify destination", "type": "main", "index": 0 }]] },
+    "Every hour": { "main": [[{ "node": "Get overdue open tickets", "type": "main", "index": 0 }]] },
+    "Get overdue open tickets": { "main": [[{ "node": "Notify overdue", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}
