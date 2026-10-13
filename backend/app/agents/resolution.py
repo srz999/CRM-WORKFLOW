@@ -23,7 +23,9 @@ Rules:
 - requires_human_approval: true if the next step involves money, refunds, account/security changes, or
   a judgement call; give approval_reason in that case.
 
-Respond with JSON only: {"next_action", "requires_human_approval", "approval_reason", "ticket_title"}"""
+Respond with JSON only, exactly this shape:
+{"next_action": "string", "requires_human_approval": true, "approval_reason": "string or null",
+ "ticket_title": "string"}"""
 
 
 @dataclass

@@ -43,7 +43,6 @@ class OpenAILLM:
         self.temperature = settings.llm_temperature
         self.client = OpenAI(
             api_key=settings.openai_api_key,
-            base_url=settings.openai_base_url or None,
             timeout=settings.llm_timeout_seconds,
             max_retries=0,  # the workflow owns the (bounded) retry policy
         )

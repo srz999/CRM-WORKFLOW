@@ -7,8 +7,7 @@ from sqlalchemy import select
 from ..agents.llm import LLMClient, LLMError, get_llm
 from ..config import get_settings
 from ..db import session_scope
-from ..models import Conversation, Ticket, WorkflowRun, format_ticket_number
-from ..notify import notify_tickets_created
+from ..models import Conversation, WorkflowRun
 from . import persistence as db
 from .graph import build_conversation_graph
 
@@ -88,14 +87,4 @@ def run_workflow(conversation_id: int, llm: LLMClient | None = None) -> int:
     db.finalize_run(run_id, status=final.get("status", "failed"), error=final.get("error"),
                     counters=counters, state=state_summary)
 
-    if created_ids:
-        with session_scope() as s:
-            tickets = s.scalars(select(Ticket).where(Ticket.id.in_(created_ids))).all()
-            payload = [
-                {"ticket_id": t.id, "ticket_number": format_ticket_number(t.id), "priority": t.priority,
-                 "team": t.team, "title": t.title, "status": t.status, "category": t.category,
-                 "due_at": t.due_at.isoformat() if t.due_at else None}
-                for t in tickets
-            ]
-        notify_tickets_created(payload)
     return run_id

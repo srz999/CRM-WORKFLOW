@@ -20,7 +20,8 @@ Do NOT base priority on tone or sentiment. An angry customer asking a routine qu
 factors: 1-4 short, evidence-based reasons that reference facts from the issue.
 Set needs_review=true if the information is too thin to judge.
 
-Respond with JSON only: {"priority", "factors", "confidence", "needs_review"}"""
+Respond with JSON only, exactly this shape (factors is ALWAYS an array of strings):
+{"priority": "MEDIUM", "factors": ["reason one", "reason two"], "confidence": 0.8, "needs_review": false}"""
 
 
 def prioritize_issue(llm: LLMClient, *, issue: dict, classification: dict) -> PriorityOutput:

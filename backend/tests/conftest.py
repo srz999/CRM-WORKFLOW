@@ -5,7 +5,6 @@ os.environ["DATABASE_URL"] = os.environ.get(
     "TEST_DATABASE_URL", "postgresql+psycopg://postgres:postgres@localhost:5432/crm_test"
 )
 os.environ["OPENAI_API_KEY"] = ""  # tests must never call the real API
-os.environ["N8N_WEBHOOK_URL"] = ""
 
 from pathlib import Path  # noqa: E402
 

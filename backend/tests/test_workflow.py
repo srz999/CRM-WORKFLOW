@@ -163,15 +163,29 @@ def test_extraction_failure_fails_run_safely():
     assert tickets_for(conv_id) == []
 
 
-def test_openai_errors_are_classified():
-    from app.agents.llm import OpenAILLM
+def test_openai_errors_are_classified(monkeypatch):
+    import httpx
+
+    from app.agents.llm import LLMError, OpenAILLM
     from app.config import Settings
 
-    llm = OpenAILLM(Settings(openai_api_key="sk-test", openai_base_url="http://127.0.0.1:9/v1",
-                             llm_timeout_seconds=0.5))
+    llm = OpenAILLM(Settings(openai_api_key="sk-test"))
+    req = httpx.Request("POST", "https://api.openai.com/v1/chat/completions")
+
+    def raise_(exc):
+        def f(**_):
+            raise exc
+        return f
+
+    monkeypatch.setattr(llm.client.chat.completions, "create", raise_(openai.APITimeoutError(request=req)))
     with pytest.raises(RetryableLLMError):
         llm.complete_json(agent="extraction", system="s", payload={})
-    assert issubclass(openai.RateLimitError, openai.APIStatusError)
+    resp = httpx.Response(401, request=req)
+    monkeypatch.setattr(llm.client.chat.completions, "create",
+                        raise_(openai.AuthenticationError("bad key", response=resp, body=None)))
+    with pytest.raises(LLMError) as e:
+        llm.complete_json(agent="extraction", system="s", payload={})
+    assert not e.value.retryable and "sk-" not in str(e.value)
 
 
 # 10 ------------------------------------------------------------------------
@@ -190,16 +204,6 @@ def test_duplicate_processing_creates_no_duplicate_tickets():
     with session_scope() as s:
         assert s.scalar(select(func.count()).select_from(Ticket)) == 2
         assert s.scalar(select(func.count()).select_from(TicketEvent)) == 2  # one 'created' each
-
-
-# 14 ------------------------------------------------------------------------
-def test_core_workflow_works_when_n8n_unreachable(monkeypatch):
-    from app.config import get_settings
-
-    monkeypatch.setattr(get_settings(), "n8n_webhook_url", "http://127.0.0.1:9/webhook/none")
-    conv_id, run_id = submit("S02")
-    assert run_row(run_id)["status"] == "completed"
-    assert tickets_for(conv_id)[0]["priority"] == "URGENT"
 
 
 # 15 ------------------------------------------------------------------------

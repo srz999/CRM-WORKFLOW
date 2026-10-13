@@ -26,8 +26,11 @@ Rules:
   it determinable (e.g. "tomorrow" -> 24, "in 3 days" -> 72); else null.
 Never invent facts, order numbers, amounts or dates.
 
-Respond with JSON only: {"issues": [ {summary, evidence, customer_ref, customer_impact, requested_action,
-missing_information, affected_users, amount, deadline_text, deadline_hours}, ... ]}"""
+Respond with JSON only, exactly this shape and these types (evidence and missing_information are ALWAYS
+arrays of strings, even with one item; numbers are plain numbers without currency symbols; use null when unknown):
+{"issues": [{"summary": "string", "evidence": ["verbatim quote", "..."], "customer_ref": "string or null",
+  "customer_impact": "string or null", "requested_action": "string or null", "missing_information": ["string"],
+  "affected_users": 12, "amount": 89.99, "deadline_text": "string or null", "deadline_hours": 24}]}"""
 
 
 def extract_issues(llm: LLMClient, *, conversation_text: str, known_customer_ref: str | None) -> ExtractionOutput:

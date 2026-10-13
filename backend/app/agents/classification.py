@@ -25,7 +25,9 @@ If the issue does not clearly fit, or the text is too vague, use category "other
 subcategory "unclassified" and needs_review=true. Never invent new categories.
 confidence is your confidence (0-1) in the category.
 
-Respond with JSON only: {{"issue_type", "category", "subcategory", "confidence", "rationale", "needs_review"}}"""
+Respond with JSON only, exactly this shape:
+{{"issue_type": "complaint", "category": "<category key>", "subcategory": "<subcategory key>",
+  "confidence": 0.85, "rationale": "short reason", "needs_review": false}}"""
 
 
 def classify_issue(llm: LLMClient, *, issue: dict) -> ClassificationOutput:

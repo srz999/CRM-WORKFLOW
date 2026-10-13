@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import String, cast, func, or_, select
 from sqlalchemy.orm import Session, selectinload
@@ -40,7 +38,6 @@ def list_tickets(
     team: str | None = Query(None, max_length=64),
     q: str | None = Query(None, max_length=200),
     conversation_id: int | None = None,
-    overdue: bool = False,
     limit: int = Query(200, ge=1, le=500),
 ):
     stmt = select(Ticket).options(*TICKET_LOAD).join(Issue).outerjoin(Customer, Ticket.customer_id == Customer.id)
@@ -54,8 +51,6 @@ def list_tickets(
         stmt = stmt.where(Ticket.team == team)
     if conversation_id:
         stmt = stmt.where(Ticket.conversation_id == conversation_id)
-    if overdue:
-        stmt = stmt.where(Ticket.due_at < datetime.now(timezone.utc), Ticket.status.not_in(CLOSED_STATUSES))
     if q and q.strip():
         like = f"%{q.strip()}%"
         conds = [Issue.summary.ilike(like), Customer.reference.ilike(like), Ticket.title.ilike(like),

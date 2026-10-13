@@ -80,3 +80,40 @@ def test_resolution_non_sensitive_respects_llm():
     rec = recommend_resolution(llm, issue={"summary": "x"}, priority="LOW", missing_information=[],
                                classification={"category": "general_support", "subcategory": "general_question"})
     assert rec.team == "General Support" and rec.sla_hours == 72 and not rec.requires_human_approval
+
+
+# Regression: real models return slightly different JSON shapes (seen with gpt-4o-mini).
+def test_extraction_tolerates_common_shape_drift():
+    raw = {"issues": [{
+        "summary": "Customer charged twice for one order",
+        "evidence": "two deductions of $89.99",            # string instead of list
+        "missing_information": None,                       # null instead of []
+        "customer_ref": "N/A",                             # placeholder instead of null
+        "amount": "$89.99",                                # currency string
+        "affected_users": "35 employees",
+        "deadline_hours": "unknown",
+    }]}
+    issue = extract_issues(Static(raw), conversation_text="x" * 20, known_customer_ref=None).issues[0]
+    assert issue.evidence == ["two deductions of $89.99"]
+    assert issue.missing_information == [] and issue.customer_ref is None
+    assert issue.amount == 89.99 and issue.affected_users == 35 and issue.deadline_hours is None
+
+    single = extract_issues(Static({"issues": {"summary": "Login fails after reset", "evidence": ["x"]}}),
+                            conversation_text="x" * 20, known_customer_ref=None)
+    assert len(single.issues) == 1
+
+
+def test_other_agents_tolerate_shape_drift():
+    c = classify_issue(Static({"issue_type": "Complaint", "category": "Billing_Payments",
+                               "subcategory": "duplicate charge", "confidence": "90"}), issue={})
+    assert (c.issue_type, c.category, c.subcategory, c.confidence) == (
+        "complaint", "billing_payments", "duplicate_charge", 0.9)
+    p = prioritize_issue(Static({"priority": " medium ", "factors": "one factor", "confidence": 0.7}),
+                         issue={}, classification={})
+    assert p.priority == "MEDIUM" and p.factors == ["one factor"]
+    # meaning-changing problems still fail
+    with pytest.raises(AgentOutputError):
+        prioritize_issue(Static({"priority": "high", "factors": ["x"], "confidence": 0.7}), issue={}, classification={})
+    with pytest.raises(AgentOutputError):
+        extract_issues(Static({"issues": [{"summary": None, "evidence": "x"}]}), conversation_text="x" * 20,
+                       known_customer_ref=None)

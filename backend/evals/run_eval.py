@@ -48,12 +48,14 @@ def main() -> int:
             got = [{"category": t.category, "priority": t.priority,
                     "customer": t.customer.reference if t.customer else None}
                    for t in db.scalars(select(Ticket).where(Ticket.conversation_id == conv_id))]
-            status = run.status
+            status, error = run.status, run.error
         exp = EXPECTED[sid]
         count_ok, cat, prio = match(exp, got)
         totals.update(samples=1, count_ok=count_ok, expected=len(exp), cat=cat, prio=prio,
                       failed=status == "failed")
         print(f"{sid} run={status:<20} issues {len(got)}/{len(exp)}  category {cat}/{len(exp)}  priority {prio}/{len(exp)}")
+        if error:
+            print(f"    error: {error}")
 
     n = totals["expected"] or 1
     print("\nMeasured on", totals["samples"], "samples:")
