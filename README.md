@@ -196,85 +196,10 @@ docker compose exec postgres psql -U postgres -d crm -c "select ticket_id, event
 
 ---
 
-## 5. Troubleshooting
-
-| Problem | Cause | Fix |
-|---------|-------|-----|
-| `failed to connect to the docker API` / `error during connect` | Docker Desktop isn't running | Open Docker Desktop, wait for **Engine running**, then repeat `docker compose up -d postgres` |
-| `ModuleNotFoundError: No module named 'app'` | `uvicorn` was started outside the `backend` folder | `cd backend`, activate `.venv`, then run `uvicorn` again |
-| `ModuleNotFoundError: No module named 'fastapi'` (or another package) | The virtual environment isn't active | Windows: `.\.venv\Scripts\Activate.ps1`; macOS/Linux: `source .venv/bin/activate`. The prompt should start with `(.venv)` |
-| `running scripts is disabled on this system` | PowerShell execution policy | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, then activate again |
-| Dashboard shows **LLM not configured** | No key in `backend/.env` | Put `OPENAI_API_KEY=sk-...` in `backend/.env` (not `.env.example`), then restart the backend |
-| Run fails with *authentication failed* | Wrong key, or stray spaces or quotes | Paste the key again without quotes or spaces, then restart the backend |
-| Run fails with *rate limit reached* | Often means the OpenAI account has no credit | Add credit at platform.openai.com → Billing |
-| Dashboard says *Cannot reach the backend* | Terminal 1 isn't running | Start the backend (step 3) |
-| `connection refused` on port 5432 | PostgreSQL isn't running | `docker compose up -d postgres` from the repo root |
-| `database "crm_test"` / `"crm_eval" does not exist` | These databases are created only when the Postgres volume is first initialised | `docker compose exec postgres psql -U postgres -c "CREATE DATABASE crm_test;"` (same for `crm_eval`) |
-| `npm` is not recognized | Node.js isn't installed | Install Node.js LTS from https://nodejs.org, then reopen the terminal |
-
-A failed run never crashes the app. The dashboard shows the run status and a safe error message, and **Retry** reprocesses only what failed.
 
 ---
 
-## 6. Run the tests
-
-The automated tests use a **separate `crm_test` database** and a **mocked LLM**. They make no OpenAI calls and cost nothing.
-
-```bash
-cd backend          # with .venv active
-pytest -q           # expected: 55 passed
-```
-
-| # | Acceptance criterion | Test(s) |
-|---|----------------------|---------|
-| 1 | Structured issue records | `test_workflow.py::test_normal_conversation_produces_structured_issue_records`, `test_agents.py` |
-| 2 | Three issues → three tickets | `test_workflow.py::test_three_issues_produce_three_distinct_tickets` |
-| 3 | Customers never mixed | `test_workflow.py::test_multiple_customers_are_not_mixed`, `test_repeat_customer_links_to_same_customer_record` |
-| 4 | Taxonomy enforced | `test_rules.py::test_classification_outside_taxonomy_is_rejected`, `test_agents.py::test_classification_valid_and_taxonomy_enforced` |
-| 5 | Urgent / medium / low rules | `test_rules.py` (security, outage, duplicate charge, amount, deadline, floors) |
-| 6 | LLM can't override escalation | `test_rules.py::test_llm_cannot_lower_mandatory_escalation`, `test_workflow.py::test_llm_cannot_override_escalation_end_to_end` |
-| 7 | Sentiment alone doesn't set priority | `test_rules.py::test_angry_routine_question_stays_low`, `test_workflow.py::test_angry_routine_question_is_low_end_to_end` |
-| 8 | Missing info → review, never invented | `test_validation.py`, `test_workflow.py::test_missing_information_routes_to_review` |
-| 9 | Invalid LLM output handled safely | `test_workflow.py` (invalid classification, malformed JSON, timeout, extraction failure), `test_agents.py` (shape drift) |
-| 10 | No duplicate tickets on retry | `test_workflow.py::test_duplicate_processing_creates_no_duplicate_tickets` |
-| 11 | Status changes persisted and recorded | `test_api.py::test_status_and_assignment_changes_are_persisted_and_recorded`, `test_review_gate_and_review_completion` |
-| 12 | Dashboard data comes from the API | `test_api.py::test_dashboard_data_comes_from_backend` |
-| 13 | Sample dataset loads and processes | `test_api.py::test_sample_dataset_loads_and_processes` (all 15 samples vs. `expected_outcomes.json`) |
-| 14 | Core workflow needs no n8n | n8n isn't used; every workflow test runs with no external services |
-| 15 | One failure doesn't erase other results | `test_workflow.py::test_one_issue_failure_keeps_other_results_and_retry_completes` |
-
-### Live-model evaluation (optional, uses the OpenAI API)
-
-This runs the real model over all 15 samples and compares the results with `tests/fixtures/expected_outcomes.json`. It uses its own `crm_eval` database, so the dashboard data is untouched.
-
-```powershell
-# Windows (from backend, .venv active)
-$env:DATABASE_URL = "postgresql+psycopg://postgres:postgres@localhost:5432/crm_eval"
-alembic upgrade head
-python -m evals.run_eval
-Remove-Item Env:DATABASE_URL      # switch this terminal back to the main database
-```
-```bash
-# macOS / Linux
-export DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/crm_eval
-alembic upgrade head && python -m evals.run_eval
-unset DATABASE_URL
-```
-
-One measured run with `gpt-4o-mini`:
-
-| Measure | Result |
-|---------|--------|
-| Issue count exact | 15/15 samples |
-| Category accuracy | 18/21 (86%) |
-| Priority accuracy | 17/21 (81%) |
-| Failed runs | 0 |
-
-LLM output varies, so expect small differences between runs.
-
----
-
-## 7. How it works
+## 5. How it works
 
 ```
 React dashboard ──/api──▶ FastAPI ──▶ LangGraph orchestrator ──▶ OpenAI (4 agents)
@@ -330,7 +255,7 @@ The graph routes five cases:
 
 ---
 
-## 8. Reference
+## 6. Reference
 
 ### Configuration (`backend/.env`)
 
